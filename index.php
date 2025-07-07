@@ -1,26 +1,38 @@
 <?php
 session_start();
 require_once('dbConfig.php');
-if(isset($_POST["submit"])){
-$email=$_POST['email'];
-$password=$_POST['password'];
-$data=mysqli_query($connt,"SELECT * FROM  members  WHERE password ='$password' OR email='$email'");
-$row=mysqli_fetch_assoc($data);
-if(mysqli_num_rows($data) > 0){
-  if($password==$row['password']){
-    $_SESSION["login"] = true;
-    $_SESSION["id"]=$row["id"];
-    header("Location: accueil.php");
-  }
-  else{
-    $errors[] = "Wrong Password";
-  }
-}
-  else{
-    $errors[] = "User Not Registred";
-  }
+$errors = [];
+
+if (isset($_POST["submit"])) {
+    $email = mysqli_real_escape_string($connt, $_POST['email']);
+    $password = $_POST['password'];
+
+    $query = mysqli_query($connt, "SELECT * FROM members WHERE email = '$email'");
+    $row = mysqli_fetch_assoc($query);
+
+    if ($row) {
+        if (password_verify($password, $row['password'])) {
+            $_SESSION["index"] = true;
+            $_SESSION["id"] = $row["id"];
+            $_SESSION["username"] = $row["username"];
+            $_SESSION["role"] = $row["role"];
+
+            // Redirection selon le rôle
+            if ($row["role"] === "admin") {
+                header("Location: admin_dashboard.php");
+            } else {
+                header("Location: accueil.php");
+            }
+            exit();
+        } else {
+            $errors[] = "Mot de passe incorrect.";
+        }
+    } else {
+        $errors[] = "Aucun utilisateur trouvé avec cet email.";
+    }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,7 +95,7 @@ if(mysqli_num_rows($data) > 0){
                   </div>
                   <div class="col-lg-6 d-flex align-items-center gradient-custom-2">
                     <div class="text-white px-3 py-4 p-md-5 mx-md-4">
-                      <h4 class="mb-4">Effortless Metting Room Reservations</h4>
+                      <h4 class="mb-4">Effortless Meeting Room Reservations</h4>
                      
                     </div>
                   </div>

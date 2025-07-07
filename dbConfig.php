@@ -1,7 +1,7 @@
 <?php
 
 
-	$connt = mysqli_connect("localhost","root","","reservation");
+	$connt = mysqli_connect("localhost","root","","res");
 
 
 

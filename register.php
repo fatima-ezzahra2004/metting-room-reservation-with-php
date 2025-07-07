@@ -1,30 +1,35 @@
 <?php
 session_start();
 require_once('dbConfig.php');
-if(isset($_POST["submit"])){
-$userName=$_POST['username'];
-$passWord=$_POST['password'];
-$email=$_POST['email'];
-$confirmpassWord=$_POST['confirmpassword'];
-$data="SELECT * FROM  members  WHERE username ='$userName' OR email='$email'";
-$check=mysqli_query($connt,$data);
-if(mysqli_num_rows($check)>0){
-  echo"<script> alert('Username or Email Has Already Taken'); </script>";
-}
-else{
-  if($passWord==$confirmpassWord){
-    $query="INSERT INTO members VALUES('','$userName','$email','$passWord')";
-    mysqli_query($connt,$query);
-    echo "<script> alert('Registration Successful'); </script>";
-  }
-  else{
-    echo "<script> alert('password does not match'); </script>";
-  }
-}
-}
+$message = "";
 
+if(isset($_POST["submit"])) {
+    $username = mysqli_real_escape_string($connt, $_POST['username']);
+    $email = mysqli_real_escape_string($connt, $_POST['email']);
+    $password = $_POST['password'];
+    $confirmpassword = $_POST['confirmpassword'];
+    $role = mysqli_real_escape_string($connt, $_POST['role']);
 
+    $check = mysqli_query($connt, "SELECT * FROM members WHERE username = '$username' OR email = '$email'");
+    if(mysqli_num_rows($check) > 0) {
+        $message = "<div class='alert alert-danger'>Nom d'utilisateur ou email déjà utilisé.</div>";
+    } else {
+        if($password === $confirmpassword) {
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $query = "INSERT INTO members (username, email, password, role) 
+                      VALUES ('$username', '$email', '$hashedPassword', '$role')";
+            if(mysqli_query($connt, $query)) {
+                $message = "<div class='alert alert-success'>Inscription réussie ! <a href='index.php'>Connecte-toi ici</a></div>";
+            } else {
+                $message = "<div class='alert alert-danger'>Erreur lors de l'inscription.</div>";
+            }
+        } else {
+            $message = "<div class='alert alert-danger'>Les mots de passe ne correspondent pas.</div>";
+        }
+    }
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,18 +82,28 @@ else{
                         placeholder="Password" />
                         <label class="form-label" for="">confirm Password</label>
                       </div>
-      
+                      <?php if(!empty($message)) echo $message; ?>
+
+                      <div class="mb-4">
+                      <label class="form-label d-block">Choisir un rôle</label>
+
+                          <div class="form-check form-check-inline">
+                             <input class="form-check-input" type="radio" name="role" id="utilisateur" value="utilisateur" checked>
+                             <label class="form-check-label" for="utilisateur">Utilisateur</label>
+                          </div>
+
+                          <div class="form-check form-check-inline">
+                             <input class="form-check-input" type="radio" name="role" id="admin" value="admin">
+                             <label class="form-check-label" for="admin">Administrateur</label>
+                          </div>
+                          </div>
                         <div class="text-center pt-1 mb-5 pb-1">
                           <button class="btn btn-primary btn-block fa-lg gradient-custom-2 mb-3" name="submit" type="submit" >register</button>
                            
                           
                         </div>
       
-                        <div class="d-flex align-items-center justify-content-center pb-4">
-                          <p class="mb-0 me-2">Already a member?</p><a class="text-muted" href="index.php">Sign in</a>
-                          
-                        </div>
-      
+                       
                       </form>
       
                     </div>

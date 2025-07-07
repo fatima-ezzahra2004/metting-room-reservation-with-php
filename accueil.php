@@ -1,14 +1,6 @@
-<?php
-session_start();
-require_once('dbConfig.php');
-if(!empty($_SESSION["id"])){
-  $id=$_SESSION["id"];
-  $result=mysqli_query($connt,"SELECT * FROM  members  WHERE id=$id");
-  $row=mysqli_fetch_assoc($result);
-}else{
-  header("location: index.php");
-}
-?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,12 +12,10 @@ if(!empty($_SESSION["id"])){
     <meta name="author" content="">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <title>Mexant - Financial HTML5 Template</title>
+    <title>accueil</title>
 
     <!-- Bootstrap core CSS -->
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
-
     <!-- Additional CSS Files -->
     <link rel="stylesheet" href="assets/css/fontawesome.css">
     <link rel="stylesheet" href="assets/css/templatemo-574-mexant.css">
@@ -56,7 +46,8 @@ if(!empty($_SESSION["id"])){
                           <li class="scroll-to-section"><a href="#top" class="active">Home</a></li>
                           <li class="scroll-to-section"><a href="calendar.php">Calendar</a></li>
                           <li class="scroll-to-section"><a href="form.php">Reservation</a></li>
-                          <li class="scroll-to-section"><a href="affichage.php">Participant</a></li>
+                          <li class="scroll-to-section"><a href="contact-us.php">Contact-us</a></li>
+                          <li class="scroll-to-section"><a href="liste_salles.php">room lists</a></li>
                           <li class="scroll-to-section"><a href="logout.php">Logout</a></li>
                       </ul>        
                       <a class='menu-trigger'>
@@ -69,7 +60,16 @@ if(!empty($_SESSION["id"])){
       </div>
   </header>
   <!-- ***** Header Area End ***** -->
+<?php
+session_start();
+include('dbConfig.php');
+if(isset($_SESSION['id'])) {
+$id=$_SESSION['id'];
+$check_query = mysqli_query($connt, "SELECT * FROM members WHERE id='$id'");
+$user_data = mysqli_fetch_assoc($check_query);
+}
 
+?>
   <!-- ***** Main Banner Area Start ***** -->
   <div class="swiper-container" id="top">
     <div class="swiper-wrapper">
@@ -79,7 +79,7 @@ if(!empty($_SESSION["id"])){
             <div class="row">
               <div class="col-lg-8">
                 <div class="header-text">
-                  <h2>Hello <em><?php echo $row["username"]; ?></em><br /></h2>
+                  <h2>Hello <em><?php echo $user_data['username']; ?></em><br /></h2>
                   <div class="div-dec"></div>
                   <p>Streamline Your Workspace With Seamless Booking Solutions!</p>
                 </div>
@@ -88,9 +88,6 @@ if(!empty($_SESSION["id"])){
           </div>
         </div>
       </div>
-      
- 
-
       
  
    
